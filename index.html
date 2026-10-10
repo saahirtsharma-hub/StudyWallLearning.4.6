@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub - Learning Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --purple: #A86DD1;
+            --blue: #5DADE2;
+            --dark: #2C3E50;
+            --light: #F8F9FA;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --glow: rgba(78, 205, 196, 0.3);
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3);
+            background-size: 1800% 1800%;
+            animation: rainbowShift 18s ease infinite;
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        @keyframes rainbowShift {
+            0% { background-position: 0% 82%; }
+            50% { background-position: 100% 19%; }
+            100% { background-position: 0% 82%; }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(78, 205, 196, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255, 230, 109, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: drift 20s ease-in-out infinite;
+        }
+
+        @keyframes drift {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .unicorn {
+            position: fixed;
+            bottom: 20px;
+            left: -200px;
+            font-size: 8rem;
+            z-index: 40;
+            animation: unicornFloat 25s linear infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+        }
+
+        @keyframes unicornFloat {
+            0% { left: -200px; bottom: 20px; transform: rotate(0deg); }
+            25% { bottom: 60vh; transform: rotate(5deg); }
+            50% { left: 50vw; bottom: 30vh; transform: rotate(-5deg); }
+            75% { bottom: 70vh; transform: rotate(3deg); }
+            100% { left: 110vw; bottom: 20px; transform: rotate(0deg); }
+        }
+
+        .sparkle {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #ff00ff, 0 0 40px #00ffff;
+            animation: sparkleFloat 3s ease-in-out infinite;
+            z-index: 39;
+        }
+
+        @keyframes sparkleFloat {
+            0%, 100% { opacity: 0; transform: translateY(0) scale(0); }
+            50% { opacity: 1; transform: translateY(-100px) scale(1); }
+        }
+
+        #accountModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        #accountModal.hidden {
+            display: none;
+        }
+
+        .account-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 30px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .account-title {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .btn {
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), var(--blue));
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), #FFA07A);
+            color: var(--dark);
+            box-shadow: 0 5px 15px rgba(255, 230, 109, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1.5rem;
+            background: var(--light);
+            border-radius: 25px;
+            border: 2px solid var(--secondary);
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            background: var(--accent);
+            border-radius: 12px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        nav button {
+            background: white;
+            border: 2px solid var(--secondary);
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        nav button:hover, nav button.active {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px var(--shadow);
+            border: 3px solid transparent;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            border-color: var(--secondary);
+        }
+
+        .card-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .assignment-card {
+            background: linear-gradient(135deg, rgba(78,205,196,0.05), rgba(168,109,209,0.05));
+            padding: 2rem;
+            border-radius: 20px;
+            border: 2px solid var(--secondary);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            animation: slideIn 0.3s ease;
+        }
+
+        .assignment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px var(--shadow);
+        }
+
+        .assignment-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .assignment-due {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .assignment-status {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .status-pending { background: rgba(255,230,109,0.3); color: #d4a500; }
+        .status-submitted { background: rgba(78,205,196,0.3); color: #00a896; }
+        .status-graded { background: rgba(255,107,107,0.3); color: #e74c3c; }
+
+        .upload-area {
+            border: 3px dashed var(--secondary);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--light);
+            margin: 1rem 0;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(255,107,107,0.05);
+        }
+
+        .input-group {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            padding: 1rem;
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .btn-small {
+            padding: 0.7rem 1.5rem;
+            font-size: 0.9rem;
+            width: auto;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .notification {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 900;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+            border-left: 5px solid var(--secondary);
+        }
+
+        @keyframes slideOut {
+            to { transform: translateX(400px); opacity: 0; }
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem;
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .achievement-badge {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 3px solid #ddd;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .achievement-badge.unlocked {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(255,230,109,0.2), rgba(255,230,109,0.1));
+            box-shadow: 0 0 20px rgba(255,230,109,0.3);
+        }
+
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-name {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .word-card {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 2rem;
+            border: 3px solid var(--accent);
+        }
+
+        .word-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .word-definition {
+            font-size: 1.2rem;
+            color: #666;
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .word-example {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            font-style: italic;
+            color: var(--purple);
+        }
+
+        .problem-display {
+            background: var(--light);
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--dark);
+            font-family: 'Space Mono', monospace;
+            border: 3px dashed var(--secondary);
+            margin-bottom: 2rem;
+        }
+
+        .answer-input {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 1rem auto;
+            display: block;
+            text-align: center;
+            font-size: 2rem;
+            padding: 1rem;
+        }
+
+        .score-display {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .score-item {
+            text-align: center;
+            padding: 1rem 2rem;
+            background: var(--light);
+            border-radius: 15px;
+            border: 2px solid var(--secondary);
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .score-label {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--light);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+            box-shadow: inset 0 2px 5px var(--shadow);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--blue));
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; }
+            nav { width: 100%; }
+            .problem-display { font-size: 2rem; padding: 2rem; }
+            .word-display { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="unicorn">🦄</div>
+    <div class="sparkle" style="left: 10%; top: 20%;"></div>
+    <div class="sparkle" style="left: 30%; top: 40%; animation-delay: 0.5s;"></div>
+    <div class="sparkle" style="left: 50%; top: 15%; animation-delay: 1s;"></div>
+    <div class="sparkle" style="left: 70%; top: 60%; animation-delay: 1.5s;"></div>
+    <div class="sparkle" style="left: 85%; top: 35%; animation-delay: 2s;"></div>
+    <div class="sparkle" style="left: 20%; top: 70%; animation-delay: 2.5s;"></div>
+
+    <!-- Account Modal -->
+    <div id="accountModal">
+        <div class="account-box">
+            <div class="account-title">🎓 StudyHub</div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+                <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+            </div>
+
+            <div id="loginTab" class="tab-content active">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com">
+                </div>
+                <button class="btn btn-full" onclick="handleLogin()">Login</button>
+            </div>
+
+            <div id="signupTab" class="tab-content">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="signupName" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="signupEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>I am a...</label>
+                    <select id="accountType">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
+                <button class="btn btn-full" onclick="handleSignup()">Create Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">🎓 StudyHub</div>
+            <nav>
+                <button data-section="home" class="active">Home</button>
+                <button data-section="math">Math</button>
+                <button data-section="english">English</button>
+                <button data-section="achievements">Achievements</button>
+            </nav>
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-name" id="userName"></span>
+                    <span class="user-role" id="userRole"></span>
+                </div>
+                <button class="btn btn-small" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Home -->
+        <section id="home" class="section active">
+            <div class="card">
+                <h2 class="card-title">Welcome to StudyHub! 🌍</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                    Your ultimate learning companion! Master math, improve your English, and track assignments.
+                </p>
+            </div>
+        </section>
+
+        <!-- Math Section -->
+        <section id="math" class="section">
+            <div class="card">
+                <h2 class="card-title">📐 Math Practice</h2>
+                
+                <div style="margin-bottom: 2rem;">
+                    <label style="font-size: 1.2rem; font-weight: 600; margin-right: 1rem;">Grade Level:</label>
+                    <select id="mathGradeLevel" onchange="generateMathProblem()" style="padding: 0.8rem 1.5rem; border: 2px solid var(--secondary); border-radius: 12px; font-family: 'Fredoka', sans-serif; font-size: 1rem; background: white; cursor: pointer;">
+                        <option value="1">Grade 1 (1-10)</option>
+                        <option value="2">Grade 2 (1-20)</option>
+                        <option value="3">Grade 3 (1-50)</option>
+                        <option value="4">Grade 4 (1-100)</option>
+                        <option value="5" selected>Grade 5 (1-100, all ops)</option>
+                        <option value="6">Grade 6 (Advanced)</option>
+                        <option value="7">Grade 7-8 (Fractions)</option>
+                        <option value="9">Grade 9+ (Algebra)</option>
+                    </select>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" id="mathSearch" placeholder="Search assignments..." onkeyup="filterMathAssignments()">
+                    <button class="btn btn-small btn-secondary" onclick="createMathAssignment()">+ Create</button>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <div class="problem-display" id="mathProblem">Click "New Problem" to start!</div>
+                    <input type="number" class="answer-input" id="mathAnswer" placeholder="Your answer..." step="0.01">
+                    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-small" onclick="checkMathAnswer()">Check Answer</button>
+                        <button class="btn btn-small btn-secondary" onclick="generateMathProblem()">New Problem</button>
+                        <button class="btn btn-small btn-accent" onclick="resetMathScore()">Reset Score</button>
+                    </div>
+                    <div class="score-display">
+                        <div class="score-item">
+                            <div class="score-value" id="mathCorrect">0</div>
+                            <div class="score-label">Correct</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-value" id="mathTotal">0</div>
+                            <div class="score-label">Total</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-value" id="mathAccuracy">0%</div>
+                            <div class="score-label">Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher: Create -->
+                <div id="mathTeacherSection" style="display:none; margin-bottom: 3rem;">
+                    <h3 style="font-size: 1.3rem; margin: 2rem 0 1rem 0;">📝 New Math Assignment</h3>
+                    <div class="input-group">
+                        <input type="text" id="mathTitle" placeholder="Title">
+                        <textarea id="mathDesc" rows="4" placeholder="Description"></textarea>
+                        <input type="date" id="mathDue">
+                        <input type="number" id="mathPoints" placeholder="Points" value="100">
+                        <button class="btn" onclick="postMathAssignment()">Post Assignment</button>
+                    </div>
+                </div>
+
+                <div id="mathAssignmentsArea"></div>
+            </div>
+        </section>
+
+        <!-- English Section -->
+        <section id="english" class="section">
+            <div class="card">
+                <h2 class="card-title">📚 English Vocabulary</h2>
+                
+                <div style="margin-bottom: 2rem;">
+                    <label style="font-size: 1.2rem; font-weight: 600; margin-right: 1rem;">Grade Level:</label>
+                    <select id="vocabGradeLevel" onchange="showNewWord()" style="padding: 0.8rem 1.5rem; border: 2px solid var(--secondary); border-radius: 12px; font-family: 'Fredoka', sans-serif; font-size: 1rem; background: white; cursor: pointer;">
+                        <option value="elementary">Elementary (K-5)</option>
+                        <option value="middle" selected>Middle School (6-8)</option>
+                        <option value="high">High School (9-12)</option>
+                        <option value="advanced">Advanced/College</option>
+                    </select>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" id="englishSearch" placeholder="Search assignments..." onkeyup="filterEnglishAssignments()">
+                    <button class="btn btn-small btn-secondary" onclick="createEnglishAssignment()">+ Create</button>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <div class="word-card">
+                        <div class="word-display" id="vocabWord">Click "New Word" to start!</div>
+                        <div class="word-definition" id="vocabDefinition"></div>
+                        <div class="word-example" id="vocabExample"></div>
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-small" onclick="showNewWord()">New Word</button>
+                        <button class="btn btn-small btn-secondary" onclick="toggleDefinition()">Show/Hide Definition</button>
+                        <button class="btn btn-small btn-accent" onclick="speakWord()">🔊 Pronounce</button>
+                    </div>
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <div class="score-item" style="display: inline-block;">
+                            <div class="score-value" id="wordsLearned">0</div>
+                            <div class="score-label">Words Learned</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher: Create -->
+                <div id="englishTeacherSection" style="display:none; margin-bottom: 3rem;">
+                    <h3 style="font-size: 1.3rem; margin: 2rem 0 1rem 0;">📝 New English Assignment</h3>
+                    <div class="input-group">
+                        <input type="text" id="englishTitle" placeholder="Title">
+                        <textarea id="englishDesc" rows="4" placeholder="Description"></textarea>
+                        <input type="date" id="englishDue">
+                        <input type="number" id="englishPoints" placeholder="Points" value="100">
+                        <button class="btn" onclick="postEnglishAssignment()">Post Assignment</button>
+                    </div>
+                </div>
+
+                <div id="englishAssignmentsArea"></div>
+            </div>
+        </section>
+
+        <!-- Achievements Section -->
+        <section id="achievements" class="section">
+            <div class="card">
+                <h2 class="card-title">🏆 Achievements & Assignments</h2>
+                
+                <div class="search-bar">
+                    <input type="text" id="achievementSearch" placeholder="Search all assignments..." onkeyup="filterAllAssignments()">
+                </div>
+
+                <h3 style="font-size: 1.3rem; margin: 2rem 0 1rem 0;">Badges Earned</h3>
+                <div class="achievement-grid" id="achievementGrid"></div>
+
+                <h3 style="font-size: 1.3rem; margin: 2rem 0 1rem 0;">📋 All Assignments</h3>
+                <div id="allAssignmentsArea"></div>
+            </div>
+        </section>
+    </div>
+
+    <input type="file" id="fileInput" multiple style="display:none;">
+
+    <script>
+        // Vocabulary Database
+        const vocabularyDatabase = {
+            elementary: [
+                { word: 'Brave', definition: 'Ready to face danger; showing courage', example: 'The brave firefighter rescued the cat.' },
+                { word: 'Curious', definition: 'Eager to know or learn something', example: 'The curious child asked many questions.' },
+                { word: 'Generous', definition: 'Showing kindness by giving freely', example: 'She was generous and shared her lunch.' },
+                { word: 'Patient', definition: 'Able to wait calmly without getting upset', example: 'The patient teacher explained the problem.' },
+                { word: 'Cheerful', definition: 'Noticeably happy and optimistic', example: 'Her cheerful smile brightened everyone\'s day.' }
+            ],
+            middle: [
+                { word: 'Eloquent', definition: 'Fluent or persuasive in speaking or writing', example: 'Her eloquent speech moved the audience.' },
+                { word: 'Compassionate', definition: 'Feeling or showing sympathy and concern', example: 'The compassionate nurse cared for patients.' },
+                { word: 'Diligent', definition: 'Having or showing care in work or duties', example: 'The diligent student studied every night.' },
+                { word: 'Profound', definition: 'Very great or intense; having deep meaning', example: 'The book had a profound effect on thinking.' },
+                { word: 'Resilient', definition: 'Able to recover quickly from difficulties', example: 'The resilient community rebuilt after the storm.' }
+            ],
+            high: [
+                { word: 'Ambiguous', definition: 'Open to more than one interpretation', example: 'The politician\'s ambiguous statement confused voters.' },
+                { word: 'Astute', definition: 'Having good judgment; shrewd', example: 'The astute investor made wise decisions.' },
+                { word: 'Coherent', definition: 'Logical and consistent; making sense', example: 'His argument was coherent and well-structured.' },
+                { word: 'Discern', definition: 'To perceive or recognize something', example: 'She could discern subtle differences.' },
+                { word: 'Ephemeral', definition: 'Lasting for a very short time', example: 'The ephemeral beauty of cherry blossoms.' }
+            ],
+            advanced: [
+                { word: 'Ameliorate', definition: 'To make something better or more tolerable', example: 'Policies were enacted to ameliorate poverty.' },
+                { word: 'Antithesis', definition: 'The direct opposite of something', example: 'His behavior was the antithesis of professional.' },
+                { word: 'Ebullient', definition: 'Cheerful and full of energy', example: 'Her ebullient personality lifted everyone\'s spirits.' },
+                { word: 'Elucidate', definition: 'To make something clear; to explain', example: 'The professor elucidated the complex theorem.' },
+                { word: 'Hegemony', definition: 'Leadership or dominance by one state', example: 'The empire established hegemony over the region.' }
+            ]
+        };
+
+        // DATABASE
+        const DATABASE = {
+            users: {
+                'demo@student.com': { name: 'Demo Student', role: 'student', email: 'demo@student.com' },
+                'demo@teacher.com': { name: 'Demo Teacher', role: 'teacher', email: 'demo@teacher.com' },
+                'saahir@studyhub.com': { name: 'Saahir', role: 'student', email: 'saahir@studyhub.com' },
+                'john@studyhub.com': { name: 'John Teacher', role: 'teacher', email: 'john@studyhub.com' }
+            },
+            mathAssignments: [
+                { id: 1, title: 'Algebra Basics', desc: 'Solve equations', due: '2024-12-20', points: 100, teacher: 'john@studyhub.com', teacherName: 'John Teacher' }
+            ],
+            englishAssignments: [
+                { id: 1, title: 'Essay Writing', desc: '500 word essay', due: '2024-12-22', points: 100, teacher: 'demo@teacher.com', teacherName: 'Demo Teacher' }
+            ],
+            submissions: {}
+        };
+
+        let dbData = localStorage.getItem('studyhub_db') ? JSON.parse(localStorage.getItem('studyhub_db')) : JSON.parse(JSON.stringify(DATABASE));
+        let currentUser = JSON.parse(localStorage.getItem('studyhub_currentUser')) || null;
+        let currentWord = null;
+        let wordsLearned = 0;
+        let definitionVisible = false;
+        let currentMathProblem = null;
+        let currentMathAnswer = null;
+        let mathStats = { correct: 0, total: 0 };
+        let usedProblems = [];
+
+        function saveDatabase() {
+            localStorage.setItem('studyhub_db', JSON.stringify(dbData));
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showNotification(msg) {
+            const div = document.createElement('div');
+            div.className = 'notification';
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (!email) {
+                showNotification('Please enter an email');
+                return;
+            }
+            if (dbData.users[email]) {
+                currentUser = dbData.users[email];
+                localStorage.setItem('studyhub_currentUser', JSON.stringify(currentUser));
+                showNotification('✅ Logged in!');
+                showUI();
+            } else {
+                showNotification('Account not found');
+            }
+        }
+
+        function handleSignup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const role = document.getElementById('accountType').value;
+            if (!name || !email) {
+                showNotification('Please fill all fields');
+                return;
+            }
+            if (dbData.users[email]) {
+                showNotification('Email already exists');
+                return;
+            }
+            dbData.users[email] = { name, role, email };
+            saveDatabase();
+            currentUser = dbData.users[email];
+            localStorage.setItem('studyhub_currentUser', JSON.stringify(currentUser));
+            showNotification('✅ Account created!');
+            showUI();
+        }
+
+        function logout() {
+            if (confirm('Logout?')) {
+                currentUser = null;
+                localStorage.removeItem('studyhub_currentUser');
+                location.reload();
+            }
+        }
+
+        function showUI() {
+            document.getElementById('accountModal').classList.add('hidden');
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = currentUser.role === 'teacher' ? '👨‍🏫 Teacher' : '👨‍🎓 Student';
+
+            if (currentUser.role === 'teacher') {
+                document.getElementById('mathTeacherSection').style.display = 'block';
+                document.getElementById('englishTeacherSection').style.display = 'block';
+            }
+
+            generateMathProblem();
+            showNewWord();
+            renderAssignments();
+            setupNavigation();
+        }
+
+        function setupNavigation() {
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.onclick = (e) => {
+                    const section = e.target.dataset.section;
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    document.getElementById(section).classList.add('active');
+                    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                };
+            });
+        }
+
+        // MATH FUNCTIONS
+        function generateMathProblem() {
+            const grade = parseInt(document.getElementById('mathGradeLevel').value);
+            let num1, num2, operation, problemStr;
+
+            do {
+                switch (grade) {
+                    case 1:
+                        operation = Math.random() > 0.5 ? '+' : '-';
+                        num1 = Math.floor(Math.random() * 10) + 1;
+                        num2 = Math.floor(Math.random() * 10) + 1;
+                        if (operation === '-' && num2 > num1) [num1, num2] = [num2, num1];
+                        break;
+                    case 2:
+                        operation = Math.random() > 0.5 ? '+' : '-';
+                        num1 = Math.floor(Math.random() * 20) + 1;
+                        num2 = Math.floor(Math.random() * 20) + 1;
+                        if (operation === '-' && num2 > num1) [num1, num2] = [num2, num1];
+                        break;
+                    case 3:
+                        operation = ['+', '-', '×'][Math.floor(Math.random() * 3)];
+                        if (operation === '×') {
+                            num1 = Math.floor(Math.random() * 10) + 1;
+                            num2 = Math.floor(Math.random() * 10) + 1;
+                        } else {
+                            num1 = Math.floor(Math.random() * 50) + 1;
+                            num2 = Math.floor(Math.random() * 50) + 1;
+                            if (operation === '-' && num2 > num1) [num1, num2] = [num2, num1];
+                        }
+                        break;
+                    case 4:
+                    case 5:
+                    case 6:
+                        operation = ['+', '-', '×', '÷'][Math.floor(Math.random() * 4)];
+                        if (operation === '×') {
+                            num1 = Math.floor(Math.random() * 15) + 1;
+                            num2 = Math.floor(Math.random() * 15) + 1;
+                        } else if (operation === '÷') {
+                            num2 = Math.floor(Math.random() * 12) + 1;
+                            currentMathAnswer = Math.floor(Math.random() * 12) + 1;
+                            num1 = num2 * currentMathAnswer;
+                        } else {
+                            num1 = Math.floor(Math.random() * 150) + 1;
+                            num2 = Math.floor(Math.random() * 150) + 1;
+                            if (operation === '-' && num2 > num1) [num1, num2] = [num2, num1];
+                        }
+                        break;
+                    case 7:
+                        const denom = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+                        num1 = Math.floor(Math.random() * denom) + 1;
+                        num2 = Math.floor(Math.random() * denom) + 1;
+                        problemStr = `${num1}/${denom} + ${num2}/${denom}`;
+                        currentMathAnswer = (num1 + num2) / denom;
+                        break;
+                    case 9:
+                        const x = Math.floor(Math.random() * 20) + 1;
+                        const a = Math.floor(Math.random() * 10) + 1;
+                        const b = Math.floor(Math.random() * 20) + 1;
+                        const result = a * x + b;
+                        problemStr = `${a}x + ${b} = ${result}. Find x`;
+                        currentMathAnswer = x;
+                        break;
+                }
+
+                if (grade <= 6 && operation !== undefined) {
+                    problemStr = `${num1} ${operation} ${num2}`;
+                    if (operation === '+') currentMathAnswer = num1 + num2;
+                    else if (operation === '-') currentMathAnswer = num1 - num2;
+                    else if (operation === '×') currentMathAnswer = num1 * num2;
+                    else if (operation === '÷') currentMathAnswer = num1 / num2;
+                }
+
+            } while (usedProblems.includes(problemStr) && usedProblems.length < 50);
+
+            usedProblems.push(problemStr);
+            if (usedProblems.length > 20) usedProblems.shift();
+
+            currentMathProblem = problemStr + ' = ?';
+            document.getElementById('mathProblem').textContent = currentMathProblem;
+            document.getElementById('mathAnswer').value = '';
+        }
+
+        function checkMathAnswer() {
+            const userAnswer = parseFloat(document.getElementById('mathAnswer').value);
+            if (isNaN(userAnswer)) {
+                showNotification('Please enter a number');
+                return;
+            }
+
+            mathStats.total++;
+            const tolerance = 0.01;
+            const isCorrect = Math.abs(userAnswer - currentMathAnswer) < tolerance;
+            
+            if (isCorrect) {
+                mathStats.correct++;
+                showNotification('🎉 Correct!');
+                document.getElementById('mathProblem').style.borderColor = 'var(--secondary)';
+            } else {
+                showNotification(`Not quite! The answer was ${currentMathAnswer}`);
+                document.getElementById('mathProblem').style.borderColor = 'var(--primary)';
+            }
+
+            updateMathStats();
+            setTimeout(() => generateMathProblem(), 1500);
+        }
+
+        function updateMathStats() {
+            document.getElementById('mathCorrect').textContent = mathStats.correct;
+            document.getElementById('mathTotal').textContent = mathStats.total;
+            const accuracy = mathStats.total > 0 ? Math.round((mathStats.correct / mathStats.total) * 100) : 0;
+            document.getElementById('mathAccuracy').textContent = accuracy + '%';
+        }
+
+        function resetMathScore() {
+            mathStats = { correct: 0, total: 0 };
+            usedProblems = [];
+            updateMathStats();
+            generateMathProblem();
+            showNotification('Score reset!');
+        }
+
+        // ENGLISH FUNCTIONS
+        function showNewWord() {
+            const level = document.getElementById('vocabGradeLevel').value;
+            const words = vocabularyDatabase[level];
+            currentWord = words[Math.floor(Math.random() * words.length)];
+            
+            document.getElementById('vocabWord').textContent = currentWord.word;
+            document.getElementById('vocabDefinition').textContent = currentWord.definition;
+            document.getElementById('vocabExample').textContent = `"${currentWord.example}"`;
+            document.getElementById('wordsLearned').textContent = ++wordsLearned;
+            definitionVisible = true;
+            document.getElementById('vocabDefinition').style.display = 'block';
+            document.getElementById('vocabExample').style.display = 'block';
+        }
+
+        function toggleDefinition() {
+            definitionVisible = !definitionVisible;
+            document.getElementById('vocabDefinition').style.display = definitionVisible ? 'block' : 'none';
+            document.getElementById('vocabExample').style.display = definitionVisible ? 'block' : 'none';
+        }
+
+        function speakWord() {
+            if (currentWord && 'speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(currentWord.word);
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            } else {
+                showNotification('Speech not supported');
+            }
+        }
+
+        function postMathAssignment() {
+            const title = document.getElementById('mathTitle').value.trim();
+            const desc = document.getElementById('mathDesc').value.trim();
+            const due = document.getElementById('mathDue').value;
+            const points = parseInt(document.getElementById('mathPoints').value) || 100;
+            if (!title || !desc || !due) {
+                showNotification('Please fill all fields');
+                return;
+            }
+            const id = Date.now();
+            dbData.mathAssignments.push({ id, title, desc, due, points, teacher: currentUser.email, teacherName: currentUser.name });
+            dbData.submissions[id] = [];
+            saveDatabase();
+            document.getElementById('mathTitle').value = '';
+            document.getElementById('mathDesc').value = '';
+            document.getElementById('mathDue').value = '';
+            renderAssignments();
+            showNotification('✅ Math assignment posted!');
+        }
+
+        function postEnglishAssignment() {
+            const title = document.getElementById('englishTitle').value.trim();
+            const desc = document.getElementById('englishDesc').value.trim();
+            const due = document.getElementById('englishDue').value;
+            const points = parseInt(document.getElementById('englishPoints').value) || 100;
+            if (!title || !desc || !due) {
+                showNotification('Please fill all fields');
+                return;
+            }
+            const id = 'eng_' + Date.now();
+            dbData.englishAssignments.push({ id, title, desc, due, points, teacher: currentUser.email, teacherName: currentUser.name });
+            dbData.submissions[id] = [];
+            saveDatabase();
+            document.getElementById('englishTitle').value = '';
+            document.getElementById('englishDesc').value = '';
+            document.getElementById('englishDue').value = '';
+            renderAssignments();
+            showNotification('✅ English assignment posted!');
+        }
+
+        function createMathAssignment() {}
+        function createEnglishAssignment() {}
+
+        function filterMathAssignments() {
+            const search = document.getElementById('mathSearch').value.toLowerCase();
+            const cards = document.getElementById('mathAssignmentsArea').querySelectorAll('.assignment-card');
+            cards.forEach(c => c.style.display = c.textContent.toLowerCase().includes(search) ? 'block' : 'none');
+        }
+
+        function filterEnglishAssignments() {
+            const search = document.getElementById('englishSearch').value.toLowerCase();
+            const cards = document.getElementById('englishAssignmentsArea').querySelectorAll('.assignment-card');
+            cards.forEach(c => c.style.display = c.textContent.toLowerCase().includes(search) ? 'block' : 'none');
+        }
+
+        function filterAllAssignments() {
+            const search = document.getElementById('achievementSearch').value.toLowerCase();
+            const cards = document.getElementById('allAssignmentsArea').querySelectorAll('.assignment-card');
+            cards.forEach(c => c.style.display = c.textContent.toLowerCase().includes(search) ? 'block' : 'none');
+        }
+
+        function renderAssignments() {
+            // Math
+            const mathHtml = dbData.mathAssignments.map(a => {
+                const sub = (dbData.submissions[a.id] || []).find(s => s.student === currentUser.email);
+                return `
+                    <div class="assignment-card">
+                        <div class="assignment-title">${a.title}</div>
+                        <div class="assignment-due">Due: ${a.due} | ${a.points} pts</div>
+                        ${sub ? `<span class="assignment-status ${sub.grade ? 'status-graded' : 'status-submitted'}">✓ ${sub.grade ? 'GRADED: ' + sub.grade : 'SUBMITTED'}</span>` : `<span class="assignment-status status-pending">PENDING</span>`}
+                        <p>${a.desc}</p>
+                        ${!sub && currentUser.role === 'student' ? `<button class="btn btn-small" onclick="submitAssignment(${a.id}, 'math')">Submit</button>` : ''}
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('mathAssignmentsArea').innerHTML = mathHtml || '<p style="color:#888;">No assignments</p>';
+
+            // English
+            const englishHtml = dbData.englishAssignments.map(a => {
+                const sub = (dbData.submissions[a.id] || []).find(s => s.student === currentUser.email);
+                return `
+                    <div class="assignment-card">
+                        <div class="assignment-title">${a.title}</div>
+                        <div class="assignment-due">Due: ${a.due} | ${a.points} pts</div>
+                        ${sub ? `<span class="assignment-status ${sub.grade ? 'status-graded' : 'status-submitted'}">✓ ${sub.grade ? 'GRADED: ' + sub.grade : 'SUBMITTED'}</span>` : `<span class="assignment-status status-pending">PENDING</span>`}
+                        <p>${a.desc}</p>
+                        ${!sub && currentUser.role === 'student' ? `<button class="btn btn-small" onclick="submitAssignment('${a.id}', 'english')">Submit</button>` : ''}
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('englishAssignmentsArea').innerHTML = englishHtml || '<p style="color:#888;">No assignments</p>';
+
+            // Achievements
+            const badges = [
+                { icon: '🥇', name: 'First Submit', condition: () => Object.values(dbData.submissions).some(s => s.length > 0) },
+                { icon: '🎓', name: '5 Submits', condition: () => Object.values(dbData.submissions).flat().length >= 5 },
+                { icon: '⭐', name: 'Perfect Math', condition: () => mathStats.total >= 10 && mathStats.correct === mathStats.total }
+            ];
+
+            document.getElementById('achievementGrid').innerHTML = badges.map(b => {
+                const unlocked = b.condition();
+                return `<div class="achievement-badge ${unlocked ? 'unlocked' : ''}"><div class="achievement-icon">${b.icon}</div><div class="achievement-name">${b.name}</div></div>`;
+            }).join('');
+
+            const allHtml = [...dbData.mathAssignments, ...dbData.englishAssignments].map(a => `
+                <div class="assignment-card">
+                    <div class="assignment-title">${a.title}</div>
+                    <div class="assignment-due">Due: ${a.due} | ${a.points} pts</div>
+                    <p>${a.desc}</p>
+                </div>
+            `).join('');
+            document.getElementById('allAssignmentsArea').innerHTML = allHtml || '<p style="color:#888;">No assignments</p>';
+        }
+
+        function submitAssignment(id, type) {
+            document.getElementById('fileInput').onchange = (e) => {
+                const files = Array.from(e.target.files);
+                if (!files.length) return;
+                if (!dbData.submissions[id]) dbData.submissions[id] = [];
+                dbData.submissions[id].push({
+                    student: currentUser.email,
+                    studentName: currentUser.name,
+                    files: files.map(f => ({name: f.name, size: f.size})),
+                    date: new Date().toISOString(),
+                    grade: null
+                });
+                saveDatabase();
+                renderAssignments();
+                showNotification('✅ Submitted!');
+            };
+            document.getElementById('fileInput').click();
+        }
+
+        if (currentUser) {
+            showUI();
+        }
+    </script>
+</body>
+</html>
